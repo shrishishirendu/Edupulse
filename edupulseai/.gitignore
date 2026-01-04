@@ -28,6 +28,8 @@ htmlcov/
 /data/processed/
 /models/artifacts/
 
+reports/
+
 # Environment and secret files
 .env
 .env.*
