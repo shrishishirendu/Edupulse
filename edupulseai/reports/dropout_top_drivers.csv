@@ -1,0 +1,31 @@
+feature,coefficient,abs_value,direction
+numeric__Curricular units 2nd sem (approved),-1.9746624444412344,1.9746624444412344,decreases_dropout_risk
+numeric__Curricular units 2nd sem (enrolled),0.9847742846997222,0.9847742846997222,increases_dropout_risk
+numeric__Curricular units 1st sem (approved),-0.8596453359324802,0.8596453359324802,decreases_dropout_risk
+numeric__Tuition fees up to date,-0.7592543188878081,0.7592543188878081,decreases_dropout_risk
+numeric__Curricular units 2nd sem (credited),0.5323360419902071,0.5323360419902071,increases_dropout_risk
+numeric__Mother's occupation,-0.3833749198863437,0.3833749198863437,decreases_dropout_risk
+numeric__Curricular units 2nd sem (grade),-0.37135710553310575,0.37135710553310575,decreases_dropout_risk
+numeric__Age at enrollment,0.3040387170670296,0.3040387170670296,increases_dropout_risk
+numeric__International,-0.24966594883913973,0.24966594883913973,decreases_dropout_risk
+numeric__Course,0.2459233402325291,0.2459233402325291,increases_dropout_risk
+numeric__Displaced,0.23238823355173208,0.23238823355173208,increases_dropout_risk
+numeric__Scholarship holder,-0.2256761617795939,0.2256761617795939,decreases_dropout_risk
+numeric__Debtor,0.2218086813209597,0.2218086813209597,increases_dropout_risk
+numeric__Curricular units 1st sem (credited),0.21530416053043894,0.21530416053043894,increases_dropout_risk
+numeric__Previous qualification,-0.21314162724792804,0.21314162724792804,decreases_dropout_risk
+numeric__Unemployment rate,0.20831958024186106,0.20831958024186106,increases_dropout_risk
+numeric__Nacionality,0.172237231855163,0.172237231855163,increases_dropout_risk
+numeric__Curricular units 1st sem (enrolled),0.17071775823500657,0.17071775823500657,increases_dropout_risk
+numeric__Curricular units 1st sem (grade),0.16975991640048896,0.16975991640048896,increases_dropout_risk
+numeric__Mother's qualification,0.1470851407941623,0.1470851407941623,increases_dropout_risk
+numeric__Father's occupation,0.12539550778506328,0.12539550778506328,increases_dropout_risk
+numeric__Application order,0.12092126061063034,0.12092126061063034,increases_dropout_risk
+numeric__Application mode,0.11957783577397206,0.11957783577397206,increases_dropout_risk
+numeric__Curricular units 2nd sem (evaluations),-0.11539542490388206,0.11539542490388206,decreases_dropout_risk
+numeric__Curricular units 2nd sem (without evaluations),-0.10960877448250378,0.10960877448250378,decreases_dropout_risk
+numeric__Curricular units 1st sem (without evaluations),-0.0822607765353689,0.0822607765353689,decreases_dropout_risk
+numeric__Marital status,-0.07616164369715935,0.07616164369715935,decreases_dropout_risk
+numeric__Father's qualification,-0.06381240869882353,0.06381240869882353,decreases_dropout_risk
+numeric__Curricular units 1st sem (evaluations),-0.03944639387803133,0.03944639387803133,decreases_dropout_risk
+numeric__Daytime/evening attendance	,-0.014503302699492598,0.014503302699492598,decreases_dropout_risk

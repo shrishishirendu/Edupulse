@@ -1,0 +1,31 @@
+dataset:
+  path: data/raw/dropout_data.csv   # or your actual filename
+  id_column: null
+  target_column: Target
+
+  # optional but recommended for this dataset:
+  trim_column_whitespace: true
+  missing_threshold: 0.6
+
+  target_positive_values: ["Dropout", "dropout", 1, "1", "Yes", "yes"]
+  target_negative_values: ["Graduate", "Enrolled", "graduate", "enrolled", 0, "0", "No", "no"]
+
+  ignore_columns: []
+  numeric_columns: []
+  categorical_columns: []
+  text_columns: []
+  datetime_columns: []
+
+  dataset:
+  target_column: Target
+  # keep your other dataset fields as-is
+
+modeling:
+  dropout_positive_labels: ["Dropout"]
+  dropout_negative_labels: ["Enrolled", "Graduate"]
+  random_state: 42
+  decision_threshold: 0.5
+  risk_thresholds:
+    high: 0.75
+    medium: 0.5
+

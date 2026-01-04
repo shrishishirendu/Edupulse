@@ -1,0 +1,51 @@
+# Python caches and artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+
+# Build / packaging outputs
+build/
+dist/
+*.egg-info/
+
+# Test and static analysis caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Streamlit local state
+.streamlit/
+
+# Data and model artifacts
+/data/raw/
+/data/processed/
+/models/artifacts/
+
+# Environment and secret files
+.env
+.env.*
+*.env
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE / editor settings
+.vscode/
+.vscode-test/
+.history/
+.idea/
+*.code-workspace
+
+# Logs and temp files
+*.log
+*.tmp
+~*
