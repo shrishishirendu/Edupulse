@@ -20,7 +20,9 @@ def _validate_path(path: Path) -> Path:
 def load_csv(path: Path) -> pd.DataFrame:
     """Load a CSV dataset from disk with a helpful missing-file error."""
     resolved = _validate_path(path)
-    return pd.read_csv(resolved)
+    df = pd.read_csv(resolved)
+    df.columns = [str(col).strip() for col in df.columns]
+    return df
 
 
 def load_dataset(path: Path, fmt: LoadFormat = "csv") -> pd.DataFrame:

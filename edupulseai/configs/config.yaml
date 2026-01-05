@@ -29,3 +29,30 @@ modeling:
     high: 0.75
     medium: 0.5
 
+interventions:
+  risk_band_priority:
+    high: 1
+    medium: 2
+    low: 3
+  playbook:
+    default_actions:
+      - "Send a check-in message"
+    default_owner: "General"
+    default_urgency: "low"
+    rules:
+      - name: "Financial Concern"
+        when_any_features_contain: ["debtor", "tuition", "fees"]
+        actions: ["Discuss financial options", "Connect with financial aid"]
+        owner: "Advisor"
+        urgency: "high"
+      - name: "Academic Performance Concern"
+        when_any_features_contain: ["curricular units", "approved", "grade", "evaluations", "admission grade"]
+        actions: ["Schedule academic counseling", "Review study plan"]
+        owner: "Advisor"
+        urgency: "medium"
+      - name: "Engagement Concern"
+        when_any_features_contain: ["attendance", "international", "displaced", "age at enrollment"]
+        actions: ["Call student", "Notify instructor"]
+        owner: "Coach"
+        urgency: "medium"
+
