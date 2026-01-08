@@ -29,7 +29,7 @@ def test_prepare_data_creates_splits_and_metadata(tmp_path: Path) -> None:
     config_dir.mkdir(parents=True, exist_ok=True)
     config_path = config_dir / "config.yaml"
     config_path.write_text(
-        f"dataset:\n  path: {dataset_path}\n  target_column: dropout\n",
+        f"dataset:\n  path: {dataset_path}\n  target_column: dropout\n  id_column: student_id\n",
         encoding="utf-8",
     )
 
@@ -51,6 +51,9 @@ def test_prepare_data_creates_splits_and_metadata(tmp_path: Path) -> None:
     assert len(train_df) == 14
     assert len(val_df) == 3
     assert len(test_df) == 3
+    for split_df in (train_df, val_df, test_df):
+        assert "student_id" in split_df.columns
+        assert split_df["student_id"].notna().all()
 
     metadata_path = processed_dir / "metadata.json"
     assert metadata_path.exists()

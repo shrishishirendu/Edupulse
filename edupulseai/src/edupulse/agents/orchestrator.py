@@ -1,39 +1,55 @@
-"""Agent orchestrator implementation."""
+"""Agent orchestrator for deterministic intervention generation."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Dict, List
+import json
+from dataclasses import asdict, dataclass
+from typing import Any, Dict
 
-from src.edupulse.models.dropout import DropoutRiskModel
-from src.edupulse.models.enrollment import EnrollmentForecaster
-from src.edupulse.models.sentiment import SentimentModel
-from src.edupulse.reporting.explain import ExplanationBuilder
-from src.edupulse.agents.tools import ToolRegistry
+from edupulse.agents.analyst import AnalystAgent
+from edupulse.agents.planner import PlannerAgent
+from edupulse.agents.tools import load_student_context
+from edupulse.agents.types import AgentResult, Plan, StudentContext
+from edupulse.agents.writer import WriterAgent
+from edupulse.agents.writer_llm import LLMWriterAgent, build_llm_client
 
 
 @dataclass
-class AnalysisOrchestrator:
-    """Coordinate analytical modules via tool registry."""
+class InterventionOrchestrator:
+    """Coordinate planner, analyst, and writer agents."""
 
-    tools: ToolRegistry
+    planner: PlannerAgent
+    analyst: AnalystAgent
+    writer: WriterAgent
 
-    def run_dropout_pipeline(self, features: Any) -> Dict[str, Any]:
-        """Execute dropout analysis and summarise output."""
-        model = self.tools.get_dropout_model()
-        scores = model.predict(features)
-        explanations = model.explain(features)
-        summary = ExplanationBuilder().summarize(explanations)
-        return {"scores": scores, "explanations": explanations, "summary": summary}
+    def run_intervention(self, student_id: str | int, cfg: Dict[str, Any]) -> Dict[str, Any]:
+        ctx: StudentContext = load_student_context(student_id, cfg)
+        plan: Plan = self.planner.run(ctx, cfg)
+        analyst_result: AgentResult = self.analyst.run(ctx, plan, cfg)
+        writer_result: AgentResult = self.writer.run(ctx, plan, cfg)
 
-    def run_sentiment_pipeline(self, texts: List[str]) -> Dict[str, Any]:
-        """Execute sentiment pipeline."""
-        model = self.tools.get_sentiment_model()
-        predictions = model.predict(texts)
-        return {"sentiment": predictions}
+        audit_log = [
+            "Loaded student context",
+            "Planner generated steps",
+            "Analyst summarized context",
+            "Writer generated drafts",
+        ]
 
-    def run_enrollment_pipeline(self, series: Any) -> Dict[str, Any]:
-        """Execute enrollment pipeline."""
-        model = self.tools.get_enrollment_model()
-        forecast = model.forecast(series)
-        return {"forecast": forecast}
+        return {
+            "context": asdict(ctx),
+            "plan": asdict(plan),
+            "analyst_summary": analyst_result.summary,
+            "analyst_details": analyst_result.details,
+            "student_message": writer_result.summary,
+            "staff_note": writer_result.details[0] if writer_result.details else "",
+            "audit_log": audit_log,
+        }
+
+
+def build_writer_agent(cfg: Dict[str, Any]) -> WriterAgent | LLMWriterAgent:
+    writer_cfg = cfg.get("writer") or {}
+    mode = writer_cfg.get("mode", "template").lower()
+    if mode == "llm":
+        client = build_llm_client(cfg)
+        return LLMWriterAgent(client=client, fallback=WriterAgent())
+    return WriterAgent()

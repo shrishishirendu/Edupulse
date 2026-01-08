@@ -1,6 +1,6 @@
 dataset:
   path: data/raw/dropout_data.csv   # or your actual filename
-  id_column: null
+  id_column: student_id
   target_column: Target
 
   # optional but recommended for this dataset:
@@ -56,3 +56,130 @@ interventions:
         owner: "Coach"
         urgency: "medium"
 
+sentiment:
+  enabled: true
+  raw_path: data/raw/student_feedback.csv
+  id_column: student_id
+  text_column: text
+  time_column: timestamp   # ISO format preferred, e.g. 2026-01-04T13:20:00
+  output_dir: reports
+
+  thresholds:
+    negative: -0.2
+    positive: 0.2
+
+  rolling_window_days: 7
+  alert:
+    negative_streak_count: 3
+    recent_days: 14
+    sudden_drop_threshold: -0.3
+
+fusion:
+  student_id_column: student_id
+  combined_queue_path: reports/combined_risk_test.csv
+  sentiment_rolling_path: reports/sentiment_student_rolling.csv
+  weights:
+    risk_band:
+      high: 3
+      medium: 2
+      low: 1
+    urgency:
+      high: 2
+      medium: 1
+      low: 0
+    sentiment_label:
+      negative: 1
+      neutral: 0
+      positive: -0.5
+    alert:
+      negative_streak: 1.5
+      sudden_drop: 1
+    sentiment_score_multiplier: 0.5
+  priority:
+    enable_escalation: true
+    bump_priority_by: 1
+    max_bumps: 2
+  output:
+    include_columns: []
+
+  fusion:
+    enabled: true
+    output_dir: reports
+
+  # file inputs (produced by earlier milestones)
+  dropout_test_path: reports/dropout_interventions_test.csv
+  dropout_val_path: reports/dropout_interventions_val.csv
+  sentiment_latest_path: reports/sentiment_student_latest.csv
+  sentiment_alerts_path: reports/sentiment_alerts.csv
+
+  # join keys
+  student_id_column: student_id  # must exist in BOTH datasets to join; if missing, script should warn and still export dropout-only
+
+  # scoring weights (generic)
+  weights:
+    risk_band:
+      high: 3
+      medium: 2
+      low: 1
+    urgency:
+      high: 3
+      medium: 2
+      low: 1
+    sentiment_label:
+      negative: 2
+      neutral: 1
+      positive: 0
+    alerts:
+      negative_streak: 3
+      sudden_drop: 2
+
+  # decision policy
+  escalation:
+    enable: true
+    bump_priority_by: 1   # smaller number = higher priority
+    max_bumps: 3
+
+  # output columns preference
+  output:
+    include_columns:
+      - student_id
+      - dropout_risk
+      - risk_band
+      - urgency
+      - priority
+      - top_reasons
+      - recommended_actions
+      - owner
+      - sentiment_score
+      - sentiment_label
+      - negative_streak
+      - sudden_drop
+      - combined_score
+      - combined_priority
+
+agents:
+  enabled: true
+  mode_default: intervention
+  inputs:
+    combined_queue_path: reports/combined_risk_test.csv
+    sentiment_rolling_path: reports/sentiment_student_rolling.csv
+  outputs:
+    dir: reports/agent_outputs
+
+  policy:
+    allow_message_drafts: true
+    no_medical_advice: true
+    no_legal_advice: true
+    tone:
+      negative: "supportive, calm, non-judgmental"
+      neutral: "helpful, concise"
+      positive: "encouraging"
+
+writer:
+  mode: llm
+  provider: lmstudio
+  endpoint: http://127.0.0.1:1234/v1
+  model: local-model
+  temperature: 0.2
+  max_tokens: 350
+  timeout_seconds: 30

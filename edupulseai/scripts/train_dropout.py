@@ -70,6 +70,18 @@ def main() -> None:
     processed_dir = PROJECT_ROOT / "data" / "processed"
     train_df, val_df, test_df = load_processed_splits(processed_dir)
 
+    dataset_cfg = config.get("dataset") or {}
+    id_column = dataset_cfg.get("id_column")
+    if id_column:
+        for df in (val_df, test_df):
+            if id_column not in df.columns:
+                df[id_column] = range(1, len(df) + 1)
+        val_ids = val_df[id_column].reset_index(drop=True)
+        test_ids = test_df[id_column].reset_index(drop=True)
+    else:
+        val_ids = None
+        test_ids = None
+
     model = train_model(train_df, config)
 
     y_val = make_binary_target(val_df, config)
@@ -93,6 +105,11 @@ def main() -> None:
 
     val_report = make_prediction_report(model, val_df, config)
     test_report = make_prediction_report(model, test_df, config)
+
+    if id_column and id_column not in val_report.columns and val_ids is not None:
+        val_report.insert(0, id_column, val_ids)
+    if id_column and id_column not in test_report.columns and test_ids is not None:
+        test_report.insert(0, id_column, test_ids)
 
     val_report.to_csv(reports_dir / "dropout_val_predictions.csv", index=False)
     test_report.to_csv(reports_dir / "dropout_test_predictions.csv", index=False)

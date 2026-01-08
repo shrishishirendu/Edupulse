@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from edupulse.models.dropout import make_binary_target, train_model
+from edupulse.models.dropout import make_binary_target, make_prediction_report, train_model
 
 
 def _sample_dataframe() -> pd.DataFrame:
@@ -69,3 +69,29 @@ def test_infers_features_when_not_provided() -> None:
 
     proba = model.predict_proba(df)
     assert proba.shape == (len(df), 2)
+
+
+def test_prediction_report_includes_id_column() -> None:
+    df = _sample_dataframe()
+    df["student_id"] = range(1, len(df) + 1)
+
+    cfg = {
+        "dataset": {
+            "target_column": "Target",
+            "id_column": "student_id",
+            "numeric_columns": ["GPA", "AttendanceRate"],
+            "categorical_columns": ["Program"],
+            "ignore_columns": [],
+        },
+        "modeling": {
+            "dropout_positive_labels": ["Dropout"],
+            "dropout_negative_labels": ["Enrolled", "Graduate"],
+            "random_state": 0,
+        },
+    }
+
+    model = train_model(df, cfg)
+    report = make_prediction_report(model, df, cfg)
+
+    assert "student_id" in report.columns
+    assert report["student_id"].tolist() == list(range(1, len(df) + 1))

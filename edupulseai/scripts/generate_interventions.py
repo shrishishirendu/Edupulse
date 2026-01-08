@@ -97,6 +97,9 @@ def _merge_predictions(
         right = preds_df.reset_index(drop=True)
         merged = pd.concat([left, right], axis=1)
 
+    if id_column and id_column not in merged.columns and id_column in split_df.columns:
+        merged[id_column] = split_df[id_column].values
+
     return merged
 
 

@@ -54,16 +54,17 @@ def load_config(config_path: Path) -> Dict[str, Any]:
     return config
 
 
-def dataset_settings(config: Dict[str, Any]) -> Tuple[Path, str]:
-    """Extract dataset path and target column from the config."""
+def dataset_settings(config: Dict[str, Any]) -> Tuple[Path, str, str | None]:
+    """Extract dataset path, target column, and optional id column from the config."""
     dataset_cfg = config.get("dataset") or {}
     dataset_path = dataset_cfg.get("path")
     target_column = dataset_cfg.get("target_column")
+    id_column = dataset_cfg.get("id_column")
     if not dataset_path:
         raise ValueError("Config missing dataset.path")
     if not target_column:
         raise ValueError("Config missing dataset.target_column")
-    return Path(dataset_path), str(target_column)
+    return Path(dataset_path), str(target_column), str(id_column) if id_column else None
 
 
 def validate_target(df: pd.DataFrame, target_column: str) -> pd.Series:
@@ -141,13 +142,15 @@ def prepare_data(config_path: Path | None = None, base_dir: Path | None = None) 
     """Prepare data splits and metadata from the given configuration."""
     root_dir, resolved_config = resolve_paths(config_path, base_dir)
     config = load_config(resolved_config)
-    dataset_path, target_column = dataset_settings(config)
+    dataset_path, target_column, id_column = dataset_settings(config)
     dataset_path = dataset_path if dataset_path.is_absolute() else root_dir / dataset_path
 
     processed_dir = root_dir / "data" / "processed"
     processed_dir.mkdir(parents=True, exist_ok=True)
 
     df = load_csv(dataset_path)
+    if id_column and id_column not in df.columns:
+        df[id_column] = range(1, len(df) + 1)
     train_df, val_df, test_df = stratified_splits(df, target_column)
 
     train_df.to_csv(processed_dir / "train.csv", index=False)

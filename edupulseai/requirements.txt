@@ -8,3 +8,4 @@ pydantic
 pyyaml
 joblib
 pytest
+requests
