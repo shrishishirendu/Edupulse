@@ -8,6 +8,8 @@ import pandas as pd
 import streamlit as st
 import yaml
 
+from theme import apply_theme, render_sidebar_branding
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CONFIG = PROJECT_ROOT / "configs" / "config.yaml"
 
@@ -78,6 +80,8 @@ def render_detail(row: pd.Series) -> None:
 
 
 def main() -> None:
+    apply_theme()
+    render_sidebar_branding()
     st.title("Action Queue")
     cfg = load_config(DEFAULT_CONFIG)
     df = load_queue(cfg)
