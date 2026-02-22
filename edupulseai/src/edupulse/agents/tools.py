@@ -9,7 +9,14 @@ import pandas as pd
 
 from edupulse.agents.types import StudentContext
 
+import sys as _sys
+
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
+APP_DIR = PROJECT_ROOT / "app"
+if str(APP_DIR) not in _sys.path:
+    _sys.path.insert(0, str(APP_DIR))
+
+from sentiment_utils import ensure_sentiment_labels, load_latest_feedback
 
 
 def safe_text(value: Any) -> str:
@@ -61,6 +68,12 @@ def _resolve_sentiment_roll_path(cfg: Dict[str, Any]) -> Path:
     return _resolve_path(candidate)
 
 
+def _resolve_feedback_path(cfg: Dict[str, Any]) -> Path:
+    sentiment_cfg = cfg.get("sentiment", {}) or {}
+    candidate = sentiment_cfg.get("raw_path") or Path("data") / "raw" / "student_feedback.csv"
+    return _resolve_path(candidate)
+
+
 def load_student_context(student_id: str | int, cfg: Dict[str, Any]) -> StudentContext:
     combined_path = _resolve_combined_path(cfg)
 
@@ -75,6 +88,10 @@ def load_student_context(student_id: str | int, cfg: Dict[str, Any]) -> StudentC
     )
     if id_col not in df.columns:
         raise ValueError(f"id column '{id_col}' not found in {combined_path}")
+
+    feedback_df = load_latest_feedback(_resolve_feedback_path(cfg))
+    df = ensure_sentiment_labels(df, student_id_col=id_col, feedback_df=feedback_df)
+
     df[id_col] = df[id_col].map(normalize_id)
     sid = normalize_id(student_id)
 

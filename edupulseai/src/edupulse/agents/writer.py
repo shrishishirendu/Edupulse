@@ -16,8 +16,17 @@ class WriterAgent:
             "positive": "encouraging and appreciative",
         }
 
+    @staticmethod
+    def _normalize_sentiment_key(value: str) -> str:
+        raw = safe_text(value).lower()
+        if "negative" in raw:
+            return "negative"
+        if "positive" in raw:
+            return "positive"
+        return "neutral"
+
     def run(self, ctx: StudentContext, plan: Plan, cfg: dict | None = None) -> AgentResult:
-        tone = self.sentiment_tones.get(safe_text(ctx.sentiment_label).lower(), "supportive and clear")
+        tone = self.sentiment_tones.get(self._normalize_sentiment_key(safe_text(ctx.sentiment_label)), "supportive and clear")
         student_msg = self._student_message(ctx, tone)
         staff_note = self._staff_note(ctx, plan)
         return AgentResult(summary=student_msg, details=[staff_note])
