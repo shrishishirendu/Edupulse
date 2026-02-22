@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -17,15 +18,41 @@ from theme import apply_theme, render_sidebar_branding
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CONFIG = PROJECT_ROOT / "configs" / "config.yaml"
+DEFAULT_CONFIG_DICT = {
+    "agents": {
+        "inputs": {
+            "combined_queue_path": "reports/combined_risk_test.csv",
+        }
+    },
+    "sentiment": {
+        "raw_path": "data/raw/student_feedback.csv",
+    },
+}
 
 
 @st.cache_data
 def load_config(config_path: Path) -> dict:
-    if yaml is None:
-        raise RuntimeError("Missing dependency: PyYAML. Add PyYAML to requirements.txt and redeploy.")
     path = config_path if config_path.is_absolute() else PROJECT_ROOT / config_path
-    with path.open("r", encoding="utf-8") as handle:
-        return yaml.safe_load(handle) or {}
+    if yaml is not None and path.exists():
+        with path.open("r", encoding="utf-8") as handle:
+            return yaml.safe_load(handle) or {}
+
+    # Fallback path for environments without PyYAML (or when YAML file is unavailable):
+    # try JSON config sibling first, then use built-in defaults.
+    json_path = path.with_suffix(".json")
+    if json_path.exists():
+        try:
+            with json_path.open("r", encoding="utf-8") as handle:
+                data = json.load(handle) or {}
+            if isinstance(data, dict):
+                data["_yaml_fallback"] = True
+                return data
+        except Exception:
+            pass
+
+    data = dict(DEFAULT_CONFIG_DICT)
+    data["_yaml_fallback"] = True
+    return data
 
 
 @st.cache_data
@@ -516,6 +543,8 @@ def main() -> None:
     render_sidebar_branding()
     st.title("Action Queue")
     cfg = load_config(DEFAULT_CONFIG)
+    if cfg.get("_yaml_fallback"):
+        st.warning("PyYAML not available in this environment. Using default configuration for demo.")
     df = load_queue(cfg)
     if df.empty:
         return
