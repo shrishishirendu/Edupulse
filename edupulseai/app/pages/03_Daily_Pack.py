@@ -7,7 +7,10 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError:
+    yaml = None
 
 from sentiment_utils import ensure_sentiment_labels, load_latest_feedback
 from theme import apply_theme, render_sidebar_branding
@@ -18,6 +21,8 @@ DEFAULT_CONFIG = PROJECT_ROOT / "configs" / "config.yaml"
 
 @st.cache_data
 def load_config(config_path: Path) -> dict:
+    if yaml is None:
+        raise RuntimeError("PyYAML is required. Add PyYAML to requirements.txt.")
     path = config_path if config_path.is_absolute() else PROJECT_ROOT / config_path
     with path.open("r", encoding="utf-8") as handle:
         return yaml.safe_load(handle) or {}
