@@ -10,7 +10,10 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import pandas as pd
-import yaml
+try:
+    import yaml  # type: ignore
+except ModuleNotFoundError:
+    yaml = None
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = PROJECT_ROOT / "src"
@@ -33,6 +36,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_config(path: Path) -> Dict[str, Any]:
+    if yaml is None:
+        raise RuntimeError("Missing dependency: PyYAML. Add PyYAML to requirements.txt and redeploy.")
     with path.open("r", encoding="utf-8") as handle:
         cfg = yaml.safe_load(handle) or {}
     if not isinstance(cfg, dict):

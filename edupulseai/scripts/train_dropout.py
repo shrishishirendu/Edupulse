@@ -9,7 +9,10 @@ from pathlib import Path
 from typing import Any, Dict
 
 import joblib
-import yaml
+try:
+    import yaml  # type: ignore
+except ModuleNotFoundError:
+    yaml = None
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = PROJECT_ROOT / "src"
@@ -50,6 +53,8 @@ def resolve_config_path(config_path: Path) -> Path:
 
 
 def load_config(config_path: Path) -> Dict[str, Any]:
+    if yaml is None:
+        raise RuntimeError("Missing dependency: PyYAML. Add PyYAML to requirements.txt and redeploy.")
     with config_path.open("r", encoding="utf-8") as handle:
         data = yaml.safe_load(handle) or {}
     if not isinstance(data, dict):

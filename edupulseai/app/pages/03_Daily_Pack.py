@@ -8,7 +8,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 try:
-    import yaml
+    import yaml  # type: ignore
 except ModuleNotFoundError:
     yaml = None
 
@@ -22,7 +22,7 @@ DEFAULT_CONFIG = PROJECT_ROOT / "configs" / "config.yaml"
 @st.cache_data
 def load_config(config_path: Path) -> dict:
     if yaml is None:
-        raise RuntimeError("PyYAML is required. Add PyYAML to requirements.txt.")
+        raise RuntimeError("Missing dependency: PyYAML. Add PyYAML to requirements.txt and redeploy.")
     path = config_path if config_path.is_absolute() else PROJECT_ROOT / config_path
     with path.open("r", encoding="utf-8") as handle:
         return yaml.safe_load(handle) or {}

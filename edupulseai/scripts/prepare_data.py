@@ -9,7 +9,10 @@ from pathlib import Path
 from typing import Any, Dict, Tuple
 
 import pandas as pd
-import yaml
+try:
+    import yaml  # type: ignore
+except ModuleNotFoundError:
+    yaml = None
 from sklearn.model_selection import train_test_split
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -47,6 +50,8 @@ def resolve_paths(config_path: Path | None, base_dir: Path | None) -> Tuple[Path
 
 def load_config(config_path: Path) -> Dict[str, Any]:
     """Load YAML configuration from disk."""
+    if yaml is None:
+        raise RuntimeError("Missing dependency: PyYAML. Add PyYAML to requirements.txt and redeploy.")
     with config_path.open("r", encoding="utf-8") as handle:
         config = yaml.safe_load(handle) or {}
     if not isinstance(config, dict):
