@@ -34,6 +34,11 @@ def apply_theme() -> None:
         [data-testid="stSidebar"] {
             background-color: var(--ax-bg);
         }
+        section[data-testid="stSidebar"] > div:first-child {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
         [data-testid="stSidebar"] * {
             color: var(--ax-text);
         }
@@ -158,6 +163,13 @@ def apply_theme() -> None:
             border: 1px solid var(--ax-border);
             border-radius: 12px;
         }
+        .sidebar-spacer {
+            flex: 1 1 auto;
+        }
+        .sidebar-footer {
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -166,9 +178,11 @@ def apply_theme() -> None:
 
 def render_sidebar_branding() -> None:
     logo_path = Path("app/assets/isoft_logo.png")
-    st.sidebar.markdown('<div style="height: 8px;"></div>', unsafe_allow_html=True)
-    if logo_path.is_file():
-        st.sidebar.image(str(logo_path), width=150)
-    else:
-        st.sidebar.markdown("iSoft logo missing: `app/assets/isoft_logo.png`")
-    st.sidebar.markdown("---")
+    with st.sidebar:
+        st.markdown("<div class='sidebar-spacer'></div>", unsafe_allow_html=True)
+        st.markdown("<div class='sidebar-footer'>", unsafe_allow_html=True)
+        if logo_path.is_file():
+            st.image(str(logo_path), width=150)
+        else:
+            st.markdown("iSoft logo missing: `app/assets/isoft_logo.png`")
+        st.markdown("</div>", unsafe_allow_html=True)
