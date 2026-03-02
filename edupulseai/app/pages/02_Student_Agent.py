@@ -11,7 +11,6 @@ try:
 except ModuleNotFoundError:
     yaml = None
 
-from app.display_utils import format_probability_4dp
 from theme import apply_theme, render_sidebar_branding
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -61,6 +60,17 @@ def _safe_text(value: object) -> str:
     if isinstance(value, float) and pd.isna(value):
         return ""
     return str(value).strip()
+
+
+def fmt4(x):
+    try:
+        import pandas as pd
+
+        if x is None or (isinstance(x, float) and pd.isna(x)):
+            return ""
+        return f"{float(x):.4f}"
+    except Exception:
+        return ""
 
 
 def _first_available(row: pd.Series | dict, keys: list[str], default: str = "") -> str:
@@ -296,7 +306,7 @@ def main() -> None:
         st.write(
             f"Retention Tier: {ctx.get('risk_band')}, Priority: {ctx.get('combined_priority')}, "
             f"Intervention Priority: {ctx.get('urgency')}, "
-            f"Dropout Probability: {format_probability_4dp(ctx.get('dropout_risk'))}"
+            f"Attrition Likelihood: {fmt4(ctx.get('dropout_risk'))}"
         )
         st.write(f"Engagement Signal: {ctx.get('sentiment_label')} ({ctx.get('sentiment_score')})")
         st.write(f"Top reasons: {ctx.get('top_reasons')}")
