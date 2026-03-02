@@ -554,9 +554,12 @@ def main() -> None:
     render_risk_urgency_info(df)
 
     df_filtered = filter_df(df)
-    display_cols = ["student_id", "risk_band", "urgency", "sentiment_label"]
-    cols_present = [col for col in display_cols if col in df_filtered.columns]
-    styled_df = df_filtered[cols_present].style.applymap(sentiment_style, subset=["sentiment_label"])
+    df_display = df_filtered.copy()
+    if "dropout_risk" in df_display.columns:
+        df_display["Dropout Probability"] = pd.to_numeric(df_display["dropout_risk"], errors="coerce").round(4)
+    display_cols = ["student_id", "Dropout Probability", "risk_band", "urgency", "sentiment_label"]
+    cols_present = [col for col in display_cols if col in df_display.columns]
+    styled_df = df_display[cols_present].style.applymap(sentiment_style, subset=["sentiment_label"])
     st.dataframe(styled_df, use_container_width=True)
 
     if not df_filtered.empty and "student_id" in df_filtered.columns:
