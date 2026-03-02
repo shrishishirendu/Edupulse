@@ -166,7 +166,7 @@ def _render_case_card(row: pd.Series, accent_color: str) -> None:
         f"""
         <div style="background:#111827;border:1px solid #374151;border-left:4px solid {accent_color};border-radius:12px;padding:12px 14px;margin-bottom:10px;">
             <div style="font-weight:700;">{student_label} <span style="color:#9ca3af;font-weight:500;">({student_id})</span></div>
-            <div style="margin-top:6px;color:#d1d5db;">Risk Band: <b>{risk}</b> &nbsp;|&nbsp; Urgency: <b>{urgency}</b> &nbsp;|&nbsp; Sentiment: <b>{sentiment}</b></div>
+            <div style="margin-top:6px;color:#d1d5db;">Retention Tier: <b>{risk}</b> &nbsp;|&nbsp; Intervention Priority: <b>{urgency}</b> &nbsp;|&nbsp; Engagement Signal: <b>{sentiment}</b></div>
             <div style="margin-top:6px;color:#d1d5db;">Primary Signal: {signal}</div>
             <div style="margin-top:6px;color:#d1d5db;">Suggested Action Type: <b>{action}</b></div>
         </div>

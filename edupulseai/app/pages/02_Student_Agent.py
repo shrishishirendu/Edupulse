@@ -11,6 +11,7 @@ try:
 except ModuleNotFoundError:
     yaml = None
 
+from app.display_utils import format_probability_4dp
 from theme import apply_theme, render_sidebar_branding
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -293,10 +294,11 @@ def main() -> None:
 
         st.subheader("Risk Summary")
         st.write(
-            f"Risk band: {ctx.get('risk_band')}, Priority: {ctx.get('combined_priority')}, "
-            f"Urgency: {ctx.get('urgency')}, Dropout risk: {ctx.get('dropout_risk')}"
+            f"Retention Tier: {ctx.get('risk_band')}, Priority: {ctx.get('combined_priority')}, "
+            f"Intervention Priority: {ctx.get('urgency')}, "
+            f"Dropout Probability: {format_probability_4dp(ctx.get('dropout_risk'))}"
         )
-        st.write(f"Sentiment: {ctx.get('sentiment_label')} ({ctx.get('sentiment_score')})")
+        st.write(f"Engagement Signal: {ctx.get('sentiment_label')} ({ctx.get('sentiment_score')})")
         st.write(f"Top reasons: {ctx.get('top_reasons')}")
         st.write(f"Recommended actions: {ctx.get('recommended_actions')}")
         st.write(f"Owner: {ctx.get('owner')}")

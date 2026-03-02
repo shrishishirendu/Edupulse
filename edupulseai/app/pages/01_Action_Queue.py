@@ -13,6 +13,7 @@ try:
 except ModuleNotFoundError:
     yaml = None
 
+from app.display_utils import add_dropout_probability_display, pick_present_columns, rename_for_display
 from sentiment_utils import ensure_sentiment_labels, load_latest_feedback
 from theme import apply_theme, render_sidebar_branding
 
@@ -554,12 +555,22 @@ def main() -> None:
     render_risk_urgency_info(df)
 
     df_filtered = filter_df(df)
-    df_display = df_filtered.copy()
-    if "dropout_risk" in df_display.columns:
-        df_display["Dropout Probability"] = pd.to_numeric(df_display["dropout_risk"], errors="coerce").round(4)
-    display_cols = ["student_id", "Dropout Probability", "risk_band", "urgency", "sentiment_label"]
-    cols_present = [col for col in display_cols if col in df_display.columns]
-    styled_df = df_display[cols_present].style.applymap(sentiment_style, subset=["sentiment_label"])
+    df_display = add_dropout_probability_display(
+        df_filtered, source_col="dropout_risk", display_col="Dropout Probability"
+    )
+    df_display = rename_for_display(df_display)
+
+    display_cols = [
+        "Learner ID",
+        "Dropout Probability",
+        "Retention Tier",
+        "Intervention Priority",
+        "Engagement Signal",
+    ]
+    cols_present = pick_present_columns(df_display, display_cols)
+    styled_df = df_display[cols_present].style
+    if "Engagement Signal" in cols_present:
+        styled_df = styled_df.applymap(sentiment_style, subset=["Engagement Signal"])
     st.dataframe(styled_df, use_container_width=True)
 
     if not df_filtered.empty and "student_id" in df_filtered.columns:
